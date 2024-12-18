@@ -32,7 +32,7 @@ public class UserController {
                 .build();
     }
 
-    @GetMapping
+    @PostMapping("/registration")
     ApiResponse<List<UserResponse>> getUsers() {
         return ApiResponse.<List<UserResponse>>builder()
                 .result(userService.getUsers())
