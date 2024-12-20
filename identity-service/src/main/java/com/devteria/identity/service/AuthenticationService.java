@@ -52,10 +52,12 @@ public class AuthenticationService {
     @NonFinal
     @Value("${jwt.valid-duration}")
     protected long VALID_DURATION;
+
     @NonFinal
     @Value("${jwt.refreshable-duration}")
     protected long REFRESHABLE_DURATION;
-    public IntrospectResponse introspect(IntrospectRequest request)  {
+
+    public IntrospectResponse introspect(IntrospectRequest request) {
         var token = request.getToken();
         boolean isValid = true;
 
@@ -94,7 +96,7 @@ public class AuthenticationService {
                     InvalidatedToken.builder().id(jit).expiryTime(expiryTime).build();
 
             invalidatedTokenRepository.save(invalidatedToken);
-        } catch (AppException exception){
+        } catch (AppException exception) {
             log.info("Token already expired");
         }
     }
@@ -120,7 +122,7 @@ public class AuthenticationService {
         return AuthenticationResponse.builder().token(token).build();
     }
 
-    private String  generateToken(User user) {
+    private String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         Date issueTime = new Date();
@@ -133,8 +135,7 @@ public class AuthenticationService {
                 .issuer("devteria.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()
-                ))
+                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
                 .build();
@@ -158,8 +159,12 @@ public class AuthenticationService {
         SignedJWT signedJWT = SignedJWT.parse(token);
 
         Date expiryTime = (isRefresh)
-                ? new Date(signedJWT.getJWTClaimsSet().getIssueTime()
-                .toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli())
+                ? new Date(signedJWT
+                        .getJWTClaimsSet()
+                        .getIssueTime()
+                        .toInstant()
+                        .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)
+                        .toEpochMilli())
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(verifier);
