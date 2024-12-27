@@ -1,7 +1,8 @@
-package com.devteria.notification.services;
+package com.devteria.notification.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.devteria.notification.dto.request.EmailRequest;
@@ -10,12 +11,13 @@ import com.devteria.notification.dto.request.Sender;
 import com.devteria.notification.dto.response.EmailResponse;
 import com.devteria.notification.exception.AppException;
 import com.devteria.notification.exception.ErrorCode;
-import com.devteria.notification.repository.htppClient.EmailClient;
+import com.devteria.notification.repository.httpclient.EmailClient;
 
 import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +25,9 @@ import lombok.experimental.FieldDefaults;
 public class EmailService {
     EmailClient emailClient;
 
-    String apiKey = "your-api-brevo";
+    @Value("${notification.email.brevo-apikey}")
+    @NonFinal
+    String apiKey;
 
     public EmailResponse sendEmail(SendEmailRequest request) {
         EmailRequest emailRequest = EmailRequest.builder()
